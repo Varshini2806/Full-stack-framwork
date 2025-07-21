@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="todoApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background-color: #f4f4f4;
+      border-left: 5px solid #4CAF50;
+      border-radius: 8px;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .actions button {
+      margin-left: 8px;
+      padding: 4px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background-color: #ffa500;
+      color: white;
+    }
+
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background-color: #e69500;
+    }
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body ng-controller="TodoController">
+  <div class="container">
+    <h1>📝 My Todo List</h1>
+
+    <form ng-submit="addTask()">
+      <input type="text" ng-model="newTask" placeholder="Enter new task" required />
+      <button type="submit">{{ editIndex === -1 ? 'Add' : 'Update' }}</button>
+    </form>
+
+    <ul>
+      <li ng-repeat="task in tasks track by $index">
+        <span>{{ task }}</span>
+        <div class="actions">
+          <button class="edit-btn" ng-click="editTask($index)">Edit</button>
+          <button class="delete-btn" ng-click="deleteTask($index)">Delete</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    const app = angular.module('todoApp', []);
+    app.controller('TodoController', function($scope, $http) {
+      $scope.tasks = [];
+      $scope.newTask = '';
+      $scope.editIndex = -1;
+
+      // Load tasks
+      $http.get('/tasks').then(function(response) {
+        $scope.tasks = response.data;
+      });
+
+      // Add or update task
+      $scope.addTask = function() {
+        if ($scope.newTask) {
+          if ($scope.editIndex === -1) {
+            // Add
+            $http.post('/tasks', { task: $scope.newTask }).then(function(response) {
+              $scope.tasks.push($scope.newTask);
+              $scope.newTask = '';
+            });
+          } else {
+            // Edit (local update only)
+            $scope.tasks[$scope.editIndex] = $scope.newTask;
+            $scope.newTask = '';
+            $scope.editIndex = -1;
+            $http.post('/overwrite', { tasks: $scope.tasks }); // save edited list
+          }
+        }
+      };
+
+      // Edit
+      $scope.editTask = function(index) {
+        $scope.newTask = $scope.tasks[index];
+        $scope.editIndex = index;
+      };
+
+      // Delete
+      $scope.deleteTask = function(index) {
+        $scope.tasks.splice(index, 1);
+        $http.post('/overwrite', { tasks: $scope.tasks }); // save after delete
+      };
+    });
+  </script>
+</body>
+</html>
