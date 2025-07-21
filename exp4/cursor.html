@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="counterApp" ng-strict-di>
+<head>
+  <meta charset="UTF-8">
+  <title>Stylish AngularJS Counter | Interactive UI with Increment, Decrement & Reset</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #83a4d4, #b6fbff);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .counter-card {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .counter-value {
+      font-size: 60px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      color: white;
+    }
+
+    .btn-increment {
+      background-color: #28a745;
+    }
+
+    .btn-increment:hover {
+      background-color: #218838;
+    }
+
+    .btn-decrement {
+      background-color: #dc3545;
+    }
+
+    .btn-decrement:hover {
+      background-color: #c82333;
+    }
+
+    .btn-reset {
+      background-color: #007bff;
+    }
+
+    .btn-reset:hover {
+      background-color: #0069d9;
+    }
+  </style>
+</head>
+<body ng-controller="CounterController">
+
+  <div class="counter-card" role="main" aria-label="Counter Component">
+    <div class="counter-value" aria-live="polite">{{ counter }}</div>
+
+    <div class="button-group">
+      <button class="btn btn-increment" ng-click="increase()">+ Increment</button>
+      <button class="btn btn-decrement" ng-click="decrease()">- Decrement</button>
+      <button class="btn btn-reset" ng-click="reset()">↺ Reset</button>
+    </div>
+  </div>
+
+  <script>
+    angular.module('counterApp', [])
+      .controller('CounterController', ['$scope', function($scope) {
+        $scope.counter = 0;
+
+        $scope.increase = function() {
+          $scope.counter++;
+        };
+
+        $scope.decrease = function() {
+          if ($scope.counter > 0) {
+            $scope.counter--;
+          }
+        };
+
+        $scope.reset = function() {
+          $scope.counter = 0;
+        };
+      }]);
+  </script>
+
+</body>
+</html>
